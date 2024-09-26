@@ -50,7 +50,7 @@ class BaseModel:
         dictionary['created_at'] = self.created_at.isoformat()
         dictionary['updated_at'] = self.updated_at.isoformat()
 
-        for key in self.__dict__keys():
+        for key in self.__dict__.keys():
             if key == "_sa_instance_state":
                 del (dictionary[key])
         return dictionary

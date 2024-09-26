@@ -135,7 +135,7 @@ class HBNBCommand(cmd.Cmd):
                 key, value = param.split('=', 1)
 
                 # replace underscores with spaces and remove double quotes
-                if value.startwith('"') and value.endwith('"'):
+                if value.startswith('"') and value.endswith('"'):
                     value = value[1:-1].replace('_', ' ').replace('\\"', '"')
 
                 # handle float
