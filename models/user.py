@@ -6,12 +6,12 @@ from sqlalchemy.orm import relationship
 
 
 class User(BaseModel, Base):
-    """This is the class for user
+    """This represents the user class
     Attributes:
-        email: email address
-        password: password for you login
-        first_name: first name
-        last_name: last name
+        email: represnt tje email address
+        password: represent the password for user login
+        first_name: represent user's first name
+        last_name: represent user's last name
     """
     __tablename__ = 'users'
 
