@@ -13,10 +13,11 @@ class State(BaseModel, Base):
     name = Column(String(128), nullable=False)
 
     if storage_type == "db":
-        cities = relationship("city", cascade="all, delete", backref="states")
+        cities = relationship("City", cascade="all, delete", backref="states")
     else:
         @property
         def cities(self):
+            from models import storage
             city_list = []
             for city in storage.all(City).values():
                 if city.state_id == self.id:
