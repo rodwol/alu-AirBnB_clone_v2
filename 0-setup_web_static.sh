@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 # script that sets up your web servers for the deployment of web_static
+exit_success() {
+    exit 0
+}
 apt-get update
 apt-get -y install nginx
 
