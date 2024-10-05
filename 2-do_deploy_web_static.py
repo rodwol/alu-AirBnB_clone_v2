@@ -33,35 +33,35 @@ def do_deploy(archive_path):
         archive_no_ext = archive_file.split('.')[0]
 
         # Define the paths
-        tmp_path = f"/tmp/{archive_file}"
-        releases_folder = f"/data/web_static/releases/{archive_no_ext}"
+        tmp_path = "/tmp/{}".format(archive_file)
+        releases_folder = "/data/web_static/\
+                           releases/{}".format(archive_no_ext)
 
         # Upload the archive to the /tmp/ directory on the web server
         put(archive_path, tmp_path)
 
         # Create the directory where the archive will be uncompressed
-        run(f"mkdir -p {releases_folder}")
+        run("mkdir -p {}".format(releases_folder))
 
         # Uncompress the archive in the releases folder
-        run(f"tar -xzf {tmp_path} -C {releases_folder}")
+        run("tar -xzf {} -C {}".format(tmp_path, releases_folder))
 
         # Move the files from the uncompressed folder to the proper location
-        run(f"mv {releases_folder}/web_static/* {releases_folder}")
+        run("mv {}/web_static/* {}".format(releases_folder, releases_folder))
 
         # Remove the now-empty web_static folder
-        run(f"rm -rf {releases_folder}/web_static")
+        run("rm -rf {}/web_static".format(releases_folder))
 
         # Delete the archive from the server
-        run(f"rm {tmp_path}")
+        run("rm {}".format(tmp_path))
 
         # Delete the existing symbolic link
         run("rm -rf /data/web_static/current")
 
         # Create a new symbolic link to the new release
-        run(f"ln -s {releases_folder} /data/web_static/current")
+        run("ln -s {} /data/web_static/current".format(releases_folder))
 
         return True
 
     except Exception as e:
-        print(f"Deployment failed: {e}")
         return False
