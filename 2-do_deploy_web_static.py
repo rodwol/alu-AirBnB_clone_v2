@@ -1,67 +1,77 @@
 #!/usr/bin/python3
-"""
-Deploy web static to different servers
- 
-"""
-from fabric.api import env, put, run
+"""Comment"""
+from fabric.api import *
 import os
+import re
+from datetime import datetime
 
-# Define the IP addresses of your web servers
-env.hosts = ["18.234.175.174", "98.84.133.145"]
+env.user = 'ubuntu'
+env.hosts = ['18.234.175.174', '98.84.133.145']
+
+
+def do_pack():
+    """Comm"""
+    local("mkdir -p versions")
+    result = local("tar -cvzf versions/web_static_{}.tgz web_static"
+                   .format(datetime.strftime(datetime.now(), "%Y%m%d%H%M%S")),
+                   capture=True)
+    if result.failed:
+        return None
+    return result
 
 
 def do_deploy(archive_path):
-    """
-    Distributes an archive to web servers and sets up the web static deployment.
-
-    Args:
-        archive_path (str): The path to the archive to deploy.
-
-    Returns:
-        bool: True if the deployment was successful, False otherwise.
-    
-    """
-
-
-    # Check if the file exists
-    if not os.path.exists(archive_path):
+    """Comment"""
+    if not os.path.isfile(archive_path):
         return False
 
-    try:
-        # Extract the archive filename (with and without extension)
-        archive_file = archive_path.split('/')[-1]
-        archive_no_ext = archive_file.split('.')[0]
+    filename_regex = re.compile(r'[^/]+(?=\.tgz$)')
+    match = filename_regex.search(archive_path)
 
-        # Define the paths
-        tmp_path = "/tmp/{}".format(archive_file)
-        releases_folder = "/data/web_static/\
-                           releases/{}".format(archive_no_ext)
-
-        # Upload the archive to the /tmp/ directory on the web server
-        put(archive_path, tmp_path)
-
-        # Create the directory where the archive will be uncompressed
-        run("mkdir -p {}".format(releases_folder))
-
-        # Uncompress the archive in the releases folder
-        run("tar -xzf {} -C {}".format(tmp_path, releases_folder))
-
-        # Move the files from the uncompressed folder to the proper location
-        run("mv {}/web_static/* {}".format(releases_folder, releases_folder))
-
-        # Remove the now-empty web_static folder
-        run("rm -rf {}/web_static".format(releases_folder))
-
-        # Delete the archive from the server
-        run("rm {}".format(tmp_path))
-
-        # Delete the existing symbolic link
-        run("rm -rf /data/web_static/current")
-
-        # Create a new symbolic link to the new release
-        run("ln -s {} /data/web_static/current".format(releases_folder))
-
-        return True
-
-    except Exception as e:
+    # Upload the archive to the /tmp/ directory of the web server
+    archive_filename = match.group(0)
+    result = put(archive_path, "/tmp/{}.tgz".format(archive_filename))
+    if result.failed:
         return False
+    # Uncompress the archive to the folder
+    #     /data/web_static/releases/<archive filename without extension> on
+    #     the web server
+
+    result = run(
+        "mkdir -p /data/web_static/releases/{}/".format(archive_filename))
+    if result.failed:
+        return False
+    result = run("tar -xzf /tmp/{}.tgz -C /data/web_static/releases/{}/"
+                 .format(archive_filename, archive_filename))
+    if result.failed:
+        return False
+
+    # Delete the archive from the web server
+    result = run("rm /tmp/{}.tgz".format(archive_filename))
+    if result.failed:
+        return False
+    result = run("mv /data/web_static/releases/{}"
+                 "/web_static/* /data/web_static/releases/{}/"
+                 .format(archive_filename, archive_filename))
+    if result.failed:
+        return False
+    result = run("rm -rf /data/web_static/releases/{}/web_static"
+                 .format(archive_filename))
+    if result.failed:
+        return False
+
+    # Delete the symbolic link /data/web_static/current from the web server
+    result = run("rm -rf /data/web_static/current")
+    if result.failed:
+        return False
+
+    #  Create a new the symbolic link
+    #  /data/web_static/current on the web server,
+    #     linked to the new version of your code
+    #     (/data/web_static/releases/<archive filename without extension>)
+    result = run("ln -s /data/web_static/releases/{}/ /data/web_static/current"
+                 .format(archive_filename))
+    if result.failed:
+        return False
+
+    return True
