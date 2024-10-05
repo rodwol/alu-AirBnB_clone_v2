@@ -1,34 +1,28 @@
 #!/usr/bin/python3
-""" Documentation """
+"""
+Deploy web static to different servers
+ 
+"""
 from fabric.api import env, put, run
 import os
 
 # Define the IP addresses of your web servers
 env.hosts = ["18.234.175.174", "98.84.133.145"]
 
+
 def do_deploy(archive_path):
     """
     Distributes an archive to web servers and sets up the web static deployment.
-
-    This function performs the following steps:
-    1. Checks if the archive file exists at the specified path.
-       - If the file does not exist, it returns False.
-    2. Uploads the archive to the `/tmp/` directory on the web servers.
-    3. Uncompresses the archive to the directory
-     `/data/web_static/releases/<archive filename without extension>`.
-    4. Deletes the uploaded archive file from the `/tmp/` directory.
-    5. Deletes the current symbolic link `/data/web_static/current` on the server.
-    6. Creates a new symbolic link `/data/web_static/current`
-    pointing to the newly deployed directory.
-       - This ensures that the web server serves the new version of the site.
-    7. If all operations succeed, it returns True. Otherwise, it returns False.
 
     Args:
         archive_path (str): The path to the archive to deploy.
 
     Returns:
         bool: True if the deployment was successful, False otherwise.
+    
     """
+
+
     # Check if the file exists
     if not os.path.exists(archive_path):
         return False
