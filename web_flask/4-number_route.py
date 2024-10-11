@@ -1,5 +1,5 @@
-
-dule that starts a Flask web application"""
+#!/usr/bin/python3
+"""Module that starts a Flask web application"""
 from flask import Flask
 
 app = Flask(__name__)
