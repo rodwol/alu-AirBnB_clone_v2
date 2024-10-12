@@ -10,13 +10,12 @@ app = Flask(__name__)
 @app.route('/states', strict_slashes=False)
 def states():
     states = storage.all(State).values()
-    sorted_states = sorted(states, key=lambda state: state.name)
-    return render_template('9-states.html', states=sorted_states)
+    return render_template('9-states.html', states=states)
 
 @app.route('/states/<id>', strict_slashes=False)
 def state_cities(id):
-    states = storage.all(State)
-    state = states.get(f"State.{id}")
+    states = storage.all('State')
+    state = "State.{}".format(id)
     
     if state:
         sorted_cities = sorted(state.cities, key=lambda city: city.name)
