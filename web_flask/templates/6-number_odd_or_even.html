@@ -2,9 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Odd or Even</title>
+    <title> HBNB </title>
 </head>
 <body>
-    <h1>Number: {{ n }} is {{ even_or_odd }}</h1>
+    {% if number is even %}
+    <H1>Number: {{number}} is even</H1>
+    {% else %}
+    <H1>Number: {{number}} is odd</H1> 
+    {% endif %}
 </body>
 </html>
